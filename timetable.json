@@ -1,1 +1,52 @@
-
+[
+  {
+    "day": "Monday",
+    "subjectCode": "NTC 1052",
+    "subjectName": "Network Management & Monitoring Systems",
+    "startTime": "09:00",
+    "endTime": "13:00",
+    "venue": "KT5-L10-001",
+    "lecturer": "Syauqi",
+    "status": "Normal"
+  },
+  {
+    "day": "Tuesday",
+    "subjectCode": "SPG 0562",
+    "subjectName": "Android Programming",
+    "startTime": "09:00",
+    "endTime": "13:00",
+    "venue": "KT5-L15-012",
+    "lecturer": "Athirah Noordin",
+    "status": "Normal"
+  },
+  {
+    "day": "Wednesday",
+    "subjectCode": "CBS 2363",
+    "subjectName": "Digital Forensics & Incident Response",
+    "startTime": "08:00",
+    "endTime": "13:00",
+    "venue": "KT5-L15-003",
+    "lecturer": "Areef Aiman",
+    "status": "Normal"
+  },
+  {
+    "day": "Wednesday",
+    "subjectCode": "CBS 2383",
+    "subjectName": "Internet of Things",
+    "startTime": "14:00",
+    "endTime": "19:00",
+    "venue": "KT5-L15-003",
+    "lecturer": "Hasyimah Suhaimi",
+    "status": "Normal"
+  },
+  {
+    "day": "Thursday",
+    "subjectCode": "CBS 2372",
+    "subjectName": "Cryptography",
+    "startTime": "10:00",
+    "endTime": "13:00",
+    "venue": "KT5-L12-009",
+    "lecturer": "Nur Fatihah Amaludin",
+    "status": "Normal"
+  }
+]
