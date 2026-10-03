@@ -2,6 +2,33 @@ import json
 import os
 import re
 
+def decrypt_caesar(text, shift=3):
+    """Nyahsulit teks Caesar Cipher Shift -3 dari fail .dav Untis/GMI"""
+    decrypted = []
+    for char in text:
+        decrypted.append(chr(ord(char) - shift))
+    return "".join(decrypted)
+
+def clean_subject_name(text):
+    """Saring teks supaya hanya nama subjek/kod yang bersih diambil"""
+    # Buang simbol di awal/akhir
+    text = re.sub(r'^[^\w\s]+|[^\w\s]+$', '', text).strip()
+    
+    # Abaikan jika terlalu pendek atau terlalu panjang
+    if len(text) < 3 or len(text) > 35:
+        return None
+        
+    # Abaikan jika mengandungi susunan nombor/simbol acak (sampah offset binary)
+    if re.search(r'[\d_]{3,}', text) or re.search(r'[#\$%\^&\*=\+<>\\/]', text):
+        return None
+
+    # Pastikan teks sekurang-kurangnya 60% huruf biasa
+    letters = sum(c.isalpha() for c in text)
+    if letters / len(text) < 0.6:
+        return None
+
+    return text
+
 def parse_dav_binary():
     dav_file = "latest_schedule.dav"
     json_file = "timetable.json"
@@ -14,68 +41,74 @@ def parse_dav_binary():
         with open(dav_file, "rb") as f:
             content = f.read()
 
-        # Extract perkataan ASCII sekurang-kurangnya 4 huruf
-        raw_matches = re.findall(b'[A-Za-z0-9_\-\.]{4,}', content)
+        # 1. Ekstrak teks ASCII dari binary blob
+        raw_matches = re.findall(b'[\x20-\x7E]{4,}', content)
         
-        extracted_strings = []
+        # 2. Dekod & Nyahsulit
+        decoded_strings = []
         for b in raw_matches:
             try:
-                s = b.decode('utf-8', errors='ignore').strip()
-                # Tapis hanya perkataan yang mengandungi huruf (elak nombor/hex sampah)
-                if re.search(r'[a-zA-Z]', s) and len(s) >= 4:
-                    extracted_strings.append(s)
+                raw_str = b.decode('latin1', errors='ignore').strip()
+                dec_str = decrypt_caesar(raw_str, shift=3)
+                cleaned = clean_subject_name(dec_str)
+                if cleaned:
+                    decoded_strings.append(cleaned)
             except Exception:
                 pass
 
-        # Keywords metadata Untis / GMI yang perlu dibuang terus
+        # 3. Senarai hitam metadata & cuti awam
         blacklist = [
             "German", "Malaysian", "Institute", "Course", "Ordinary", 
             "Advanced", "Learning", "Standard", "Pflichtfach", "DiplomaDegree", 
-            "KursA", "KursB", "KursC", "VEVENT", "VCALENDAR", "Untis"
+            "KursA", "KursB", "KursC", "VEVENT", "VCALENDAR", "Untis", "Hari",
+            "Break", "Year", "Day", "Holiday", "Chinese", "Nuzul", "Eid", "Labour",
+            "Thaipusam", "Wesak", "Keputeraan", "Agong"
         ]
 
-        clean_list = []
-        for s in extracted_strings:
-            # Buang jika ada dalam blacklist atau jika rentetan terlalu panjang
-            if not any(b.lower() in s.lower() for b in blacklist) and len(s) <= 30:
-                if s not in clean_list:
-                    clean_list.append(s)
+        # 4. Tapis dan buang duplikasi
+        valid_subjects = []
+        for item in decoded_strings:
+            if not any(b.lower() in item.lower() for b in blacklist):
+                if item not in valid_subjects:
+                    valid_subjects.append(item)
 
-        # Jika senarai kosong selepas tapisan, sediakan fallback slot
-        if not clean_list:
-            clean_list = ["Cyber Security", "Digital Forensics", "Network Security", "Ethical Hacking"]
-
+        # 5. Petakan secara dinamik mengikut senarai yang berjaya diproses
         days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
         times = [
-            ("08:00", "10:00"),
-            ("10:00", "12:00"),
-            ("12:00", "14:00"),
-            ("14:00", "16:00")
+            ("08:00", "09:00"),
+            ("09:00", "10:00"),
+            ("10:00", "11:00"),
+            ("11:00", "12:00"),
+            ("12:00", "13:00"),
+            ("13:00", "14:00"),
+            ("14:00", "15:00"),
+            ("15:00", "16:00")
         ]
 
         timetable_slots = []
         
-        for idx, item_text in enumerate(clean_list[:15]):
+        for idx, sub_name in enumerate(valid_subjects):
             day_name = days[idx % len(days)]
             start_t, end_t = times[(idx // len(days)) % len(times)]
 
             slot = {
-                "raw_line": item_text,
+                "raw_line": sub_name,
                 "day": day_name,
                 "subjectCode": "DCBS 5",
-                "subjectName": item_text,
+                "subjectName": sub_name,
                 "startTime": start_t,
                 "endTime": end_t,
-                "venue": "GMI Lab",
+                "venue": "KT5-L15-003",
                 "lecturer": "Lecturer GMI",
                 "status": "Normal"
             }
             timetable_slots.append(slot)
 
+        # Simpan hasil dinamik
         with open(json_file, "w", encoding="utf-8") as f:
             json.dump(timetable_slots, f, indent=4)
 
-        print(f"Berjaya! Tapis dan simpan {len(timetable_slots)} slot bersih ke timetable.json")
+        print(f"Berjaya! Ekstrak {len(timetable_slots)} slot dinamik ke timetable.json")
 
     except Exception as e:
         print(f"Ralat semasa memproses fail .dav: {e}")
