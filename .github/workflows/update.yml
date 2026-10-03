@@ -3,8 +3,8 @@ name: Auto Convert DAV to JSON
 on:
   push:
     paths:
-      - 'latest_schedule.dav' # Jalan automatik bila fail .dav dikemas kini oleh Google Apps Script
-  workflow_dispatch: # Boleh tekan butang 'Run workflow' secara manual untuk ujian
+      - 'latest_schedule.dav'
+  workflow_dispatch:
 
 jobs:
   convert:
