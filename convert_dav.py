@@ -33,18 +33,18 @@ def parse_dav_binary():
             if len(clean_str) > 2:
                 decoded_strings.append(clean_str)
 
-        # Kata kunci metadata yang perlu dibuang
+        # Kata kunci metadata yang perlu dibuang terus
         ignore_keywords = [
             "German-Malaysian Institute", "GMI", "Course", 
             "Ordinary", "Advanced", "Learning", "Standard", "Pflichtfach",
             "DiplomaDegree", "KursA", "KursB", "KursC"
         ]
 
-        # Tapis hanya teks yang berkemungkinan nama subjek / kod kelas sebenar
+        # Tapis: hanya ambil teks yang tiada simbol pelik/garbage
         valid_texts = []
         for s in decoded_strings:
             if not any(k.lower() in s.lower() for k in ignore_keywords):
-                # Buang teks acak yang ada simbol pelik/panjang sangat
+                # Buang teks acak yang ada simbol pelik
                 if s not in valid_texts and not re.search(r'[#\$%\^&\*=\+]', s):
                     valid_texts.append(s)
 
