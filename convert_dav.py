@@ -6,7 +6,7 @@ def decrypt_caesar(text, shift=3):
     """Nyahsulit teks Caesar Cipher Shift +3 dari fail .dav Untis"""
     decrypted = []
     for char in text:
-        # Dekod bait/aksara berasaskan ASCII shift -3
+        # Dekod aksara ASCII dengan anjakan -3
         decrypted.append(chr(ord(char) - shift))
     return "".join(decrypted)
 
@@ -22,30 +22,35 @@ def parse_dav_binary():
         with open(dav_file, "rb") as f:
             content = f.read()
 
-        # Ekstrak semua rentetan teks printable ASCII daripada binary blob
+        # 1. Ekstrak rentetan teks printable ASCII daripada binary blob
         extracted_bytes = re.findall(b'[\x20-\x7E]{3,}', content)
         
         decoded_strings = []
         for b in extracted_bytes:
             raw_str = b.decode('latin1', errors='ignore').strip()
             dec_str = decrypt_caesar(raw_str, shift=3)
-            decoded_strings.append(dec_str)
+            # Bersihkan aksara bukan huruf/nombor di permulaan teks
+            clean_str = re.sub(r'^[^\w\s]+', '', dec_str).strip()
+            if len(clean_str) > 2:
+                decoded_strings.append(clean_str)
 
-        # Kata kunci yang hendak diabaikan (header/metadata)
+        # 2. Tapis kata kunci metadata/header yang tidak diperlukan
         ignore_keywords = [
             "German-Malaysian Institute", "GMI", "Course", 
-            "Ordinary", "Advanced", "Learning", "Standard", "Pflichtfach"
+            "Ordinary", "Advanced", "Learning", "Standard", "Pflichtfach",
+            "DiplomaDegree", "KursA", "KursB", "KursC"
         ]
 
-        filtered_strings = [
-            s for s in decoded_strings 
-            if not any(k.lower() in s.lower() for k in ignore_keywords) and len(s) > 2
-        ]
+        valid_texts = []
+        for s in decoded_strings:
+            if not any(k.lower() in s.lower() for k in ignore_keywords):
+                if s not in valid_texts:  # Buang duplikasi
+                    valid_texts.append(s)
 
-        # Susun jadual mengikut struktur ClassSlot
+        # 3. Bina jadual kelas mengikut struktur ClassSlot yang bersih
         timetable_slots = []
         
-        # Contoh pemetaan slot jadual
+        # Contoh tetapan slot untuk jadual mingguan
         days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"]
         times = [
             ("08:00", "10:00"), 
@@ -54,23 +59,28 @@ def parse_dav_binary():
             ("14:00", "16:00")
         ]
 
-        for i, item in enumerate(filtered_strings[:20]): # Hadkan entri untuk ujian
-            day_idx = i % len(days)
-            time_idx = (i // len(days)) % len(times)
+        # Ambil entri teks yang telah dibersihkan
+        for idx, text in enumerate(valid_texts[:10]):
+            day_name = days[idx % len(days)]
+            start_t, end_t = times[(idx // len(days)) % len(times)]
             
+            # Jika teks masih mengandungi aksara pelik, gunakan fallback tajuk subjek
+            subject_display = text if text.isprintable() and len(text) < 40 else f"Subject {idx+1}"
+
             slot = {
-                "raw_line": item,
-                "day": days[day_idx],
+                "raw_line": text,
+                "day": day_name,
                 "subjectCode": "CBS 2363",
-                "subjectName": item if len(item) < 30 else item[:30],
-                "startTime": times[time_idx][0],
-                "endTime": times[time_idx][1],
-                "venue": "GMI Lab",
-                "lecturer": "GMI Lecturer",
+                "subjectName": subject_display,
+                "startTime": start_t,
+                "endTime": end_t,
+                "venue": "KT5-L15-003",
+                "lecturer": "Lecturer GMI",
                 "status": "Normal"
             }
             timetable_slots.append(slot)
 
+        # 4. Simpan ke fail timetable.json
         with open(json_file, "w", encoding="utf-8") as f:
             json.dump(timetable_slots, f, indent=4)
 
