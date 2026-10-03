@@ -2,8 +2,8 @@ name: Auto Convert DAV to JSON
 
 on:
   push:
-    paths:
-      - 'latest_schedule.dav'
+    branches:
+      - main  # Jalan automatik setiap kali ada commit/push baharu ke main branch
   workflow_dispatch:
 
 jobs:
