@@ -1,14 +1,13 @@
-name: Auto Update Timetable
+name: Auto Convert DAV to JSON
 
 on:
-  schedule:
-    # Jalan automatik setiap 4 jam
-    - cron: '0 */4 * * *'
-  # Membolehkan kau tekan butang 'Run workflow' secara manual untuk test
-  workflow_dispatch:
+  push:
+    paths:
+      - 'latest_schedule.dav' # Jalan automatik bila fail .dav dikemas kini oleh Google Apps Script
+  workflow_dispatch: # Boleh tekan butang 'Run workflow' secara manual untuk ujian
 
 jobs:
-  check-email:
+  convert:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
@@ -19,16 +18,13 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Run Sync Script
-        env:
-          EMAIL_USER: ${{ secrets.EMAIL_USER }}
-          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
-        run: python sync_timetable.py
+      - name: Run Converter
+        run: python convert_dav.py
 
-      - name: Commit & Push Changes
+      - name: Commit & Push Updated JSON
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add timetable.json
-          git diff-index --quiet HEAD || git commit -m "Auto-update jadual dari emel"
+          git diff-index --quiet HEAD || git commit -m "Auto-convert .dav to timetable.json"
           git push
