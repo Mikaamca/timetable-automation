@@ -3190,8 +3190,19 @@
         "status": "Normal"
     },
     {
-        "raw_line": "_tbpbka",
+        "raw_line": "QBPQ",
         "day": "Monday",
+        "subjectCode": "DCBS 5",
+        "subjectName": "QBPQ",
+        "startTime": "10:00",
+        "endTime": "11:00",
+        "venue": "KT5-L15-003",
+        "lecturer": "Lecturer GMI",
+        "status": "Normal"
+    },
+    {
+        "raw_line": "_tbpbka",
+        "day": "Tuesday",
         "subjectCode": "DCBS 5",
         "subjectName": "_tbpbka",
         "startTime": "10:00",
@@ -3202,7 +3213,7 @@
     },
     {
         "raw_line": "afbkpqif`e",
-        "day": "Tuesday",
+        "day": "Wednesday",
         "subjectCode": "DCBS 5",
         "subjectName": "afbkpqif`e",
         "startTime": "10:00",
@@ -3213,7 +3224,7 @@
     },
     {
         "raw_line": "Cloq_fiarkd",
-        "day": "Wednesday",
+        "day": "Thursday",
         "subjectCode": "DCBS 5",
         "subjectName": "Cloq_fiarkd",
         "startTime": "10:00",
@@ -3224,7 +3235,7 @@
     },
     {
         "raw_line": "Dorka\u001d2",
-        "day": "Thursday",
+        "day": "Friday",
         "subjectCode": "DCBS 5",
         "subjectName": "Dorka\u001d2",
         "startTime": "10:00",
@@ -3235,18 +3246,18 @@
     },
     {
         "raw_line": "Dorka\u001d3",
-        "day": "Friday",
+        "day": "Monday",
         "subjectCode": "DCBS 5",
         "subjectName": "Dorka\u001d3",
-        "startTime": "10:00",
-        "endTime": "11:00",
+        "startTime": "11:00",
+        "endTime": "12:00",
         "venue": "KT5-L15-003",
         "lecturer": "Lecturer GMI",
         "status": "Normal"
     },
     {
         "raw_line": "Dorka\u001d4",
-        "day": "Monday",
+        "day": "Tuesday",
         "subjectCode": "DCBS 5",
         "subjectName": "Dorka\u001d4",
         "startTime": "11:00",
@@ -3257,7 +3268,7 @@
     },
     {
         "raw_line": "Dorka\u001d5",
-        "day": "Tuesday",
+        "day": "Wednesday",
         "subjectCode": "DCBS 5",
         "subjectName": "Dorka\u001d5",
         "startTime": "11:00",
