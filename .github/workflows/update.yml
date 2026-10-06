@@ -1,34 +1,45 @@
-name: Auto Convert DAV to JSON
+name: Update timetable
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+  schedule:
+    # every 30 minutes, 08:00-22:00 Malaysia time (UTC+8 = 00:00-14:00 UTC)
+    - cron: "*/30 0-14 * * *"
+  workflow_dispatch:      # "Run workflow" button in the Actions tab
 
 permissions:
-  contents: write
+  contents: write         # needed to push timetable.json
+
+concurrency:
+  group: timetable-update
+  cancel-in-progress: false
 
 jobs:
-  convert:
+  update:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
+          python-version: "3.12"
 
-      - name: Run Converter
-        run: python convert_dav.py
+      # Fails (and therefore commits nothing) if the mailbox is unreachable or the
+      # .dav format is not recognised, so the app keeps the last good timetable.
+      - name: Fetch newest .dav and rebuild timetable.json
+        env:
+          IMAP_SERVER: ${{ secrets.IMAP_SERVER }}
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+        run: python sync_timetable.py
 
-      - name: Commit & Push Updated JSON
+      - name: Commit if changed
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add timetable.json
-          git diff-index --quiet HEAD || git commit -m "Auto-convert .dav to timetable.json"
-          git pull --rebase origin main
-          git push
+          git config user.name "timetable-bot"
+          git config user.email "timetable-bot@users.noreply.github.com"
+          git add timetable.json timetable_meta.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Update timetable ($(python -c "import json;print(json.load(open('timetable_meta.json'))['source_file'])"))"
+            git push
+          fi
