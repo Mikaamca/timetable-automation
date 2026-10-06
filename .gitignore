@@ -1,0 +1,2 @@
+# The raw .dav holds every class and lecturer at GMI - keep it out of this public repo.
+*.dav
