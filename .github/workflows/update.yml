@@ -22,7 +22,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
+      - name: Check secrets (debug)
+        env:
+          EMAIL_USER: ${{ secrets.EMAIL_USER }}
+          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
+        run: |
+          echo "EMAIL_USER length: ${#EMAIL_USER}"
+          echo "EMAIL_PASS length: ${#EMAIL_PASS}"
       # Fails (and therefore commits nothing) if the mailbox is unreachable or the
       # .dav format is not recognised, so the app keeps the last good timetable.
       - name: Fetch newest .dav and rebuild timetable.json
