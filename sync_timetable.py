@@ -23,9 +23,9 @@ import sys
 from email.header import decode_header, make_header
 from pathlib import Path
 
-IMAP_SERVER = os.environ.get("IMAP_SERVER") or "imap.gmail.com"   # secrets may be set but empty
-EMAIL_USER = os.environ.get("EMAIL_USER")
-EMAIL_PASS = os.environ.get("EMAIL_PASS")
+IMAP_SERVER = os.environ.get("imap.gmail.com") or "imap.gmail.com"   # secrets may be set but empty
+EMAIL_USER = os.environ.get("mikaamca04@gmail.com")
+EMAIL_PASS = os.environ.get("mieo aldx syzi vava")
 LOOKBACK_DAYS = int(os.environ.get("LOOKBACK_DAYS") or 21)
 SENDER_FILTER = os.environ.get("SENDER_FILTER") or ""
 CLASS_NAME = os.environ.get("CLASS_NAME") or "SEM 5 - DCBS 5"
